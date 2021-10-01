@@ -1,0 +1,3 @@
+interface Lockable {
+    Markable lock();
+}

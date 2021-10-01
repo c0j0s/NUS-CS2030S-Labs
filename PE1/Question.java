@@ -1,7 +1,6 @@
-class Question {
+abstract class Question implements Lockable {
 
     private final String q;
-    //private final String[] ops;
     private final int ans;
     private final int guess;
 
@@ -23,25 +22,14 @@ class Question {
         this(q.q, q.ans, g);
     }
 
-    Question answer(int gu) {
-        return new Question(this.q, this.ans, gu);
+    abstract Question answer(int gu);
+
+    int getAns() {
+        return this.ans;
     }
 
     int getGuess() {
         return this.guess;
-    }
-
-    int mark() {
-        if(guess == ans) {
-            return 1;
-        }
-        else {
-            return 0;
-        }
-    }
-
-    Question lock() {
-        return new Question(this, this.g);
     }
 
     public String toString() {

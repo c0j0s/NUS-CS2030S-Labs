@@ -1,4 +1,4 @@
-class MCQ extends Question {
+class MCQ extends Question implements Markable{
     
     private final String[] ops;
 
@@ -15,20 +15,43 @@ class MCQ extends Question {
     MCQ answer(int g){
         return new MCQ(this, g);
     }
-    
-    @Override
-    public String toString() {
+
+    public int mark() {
+        if(super.getAns() == super.getGuess()) {
+            return 1;
+        }
+        return 0;
+    }
+
+    public Markable lock() {
+        return this;
+    }
+
+    String[] getOps() {
+        return ops;
+    }
+
+    String opsToString() {
         String op = "";
          
         for (int i = 0; i < ops.length; i++) {
             op += "[" + (i + 1) + ":" + ops[i] + "]";
         }
-        int g = getGuess();
+        
+        return op;
+    }
+
+    String getQues(){
+        return String.format("%s %s;", super.toString(), opsToString());
+    }
+
+    @Override
+    public String toString() {
+       int g = getGuess();
         String a = "[ ? ]";
         if(g != 0) {
             a = "[ " + g + ":" + ops[g - 1] + " ]";
         }
-        //System.out.println(op);
-        return String.format("%s %s; Your answer: %s", super.toString(), op, a);
+        return String.format("%s Your answer: %s", getQues(), a);
     }
 }

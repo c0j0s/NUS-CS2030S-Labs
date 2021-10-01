@@ -1,7 +1,7 @@
 class FreeTenMarksGrader extends Grader {
 
-    FreeTenMarksGrader(int ans) {
-        super(ans);
+    FreeTenMarksGrader() {
+        super(0);
     }
 
     int compute(int g) {

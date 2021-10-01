@@ -1,24 +1,32 @@
 class TFQ extends MCQ {
-    
+
 
     TFQ(String q, String ans) {
         super(q, new String[] {"True","False"}, TFQ.conAns(ans));
     }
 
-    TFQ(TFQ t, String ans) {
-        super(t, TFQ.conAns(ans));
+    TFQ(TFQ t, int ans) {
+        super(t, ans);
     }
 
     TFQ answer(String ans) {
+        return answer(conAns(ans));
+    }
+
+    TFQ answer(int ans) {
         return new TFQ(this, ans);
     }
 
+    public Markable lock() {
+        return this;
+    }
+
     static int conAns(String an){
-        int a = 0;
+        int a = 1;
         if(an.equals("False")) {
-            a = 1;
+            a = 2;
         }
-        return a;
+        return a;     
     }
 
     public String toString() {
