@@ -13,6 +13,10 @@ class ServeEvent extends Event {
         this(nextTiming, event.getCustomer(), serverId);
     }
 
+    ServeEvent(Event event, int serverId) {
+        this(event.getTime(), event.getCustomer(), serverId);
+    }
+
     @Override
     public String toString() {
         return super.toString() + " serves by server " + serverId;

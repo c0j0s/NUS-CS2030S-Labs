@@ -23,7 +23,7 @@ abstract class Event implements Comparable<Event> {
         return this.state;
     }
 
-    double getEventTiming() {
+    double getTime() {
         return this.eventTime;
     }
 
@@ -44,7 +44,5 @@ abstract class Event implements Comparable<Event> {
         }
         return diff;
     }
-
-
 
 }

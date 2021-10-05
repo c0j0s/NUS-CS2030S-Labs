@@ -2,23 +2,28 @@ package cs2030.simulator;
 
 class Customer implements Comparable<Customer> {
     private final int id;
-    private final double waitTime;
+    // private final double waitTime;
+    private final double serviceTime;
 
     Customer(int id) {
         this(id, 0);
     }
 
-    Customer(int id, double waitTime) {
+    Customer(int id, double serviceTime) {
         this.id = id;
-        this.waitTime = waitTime;
+        this.serviceTime = serviceTime;
     }
 
     Customer(Customer customer, double waitTime) {
         this(customer.id, waitTime);
     }
 
-    double getWaitTime() {
-        return waitTime;
+    // double getWaitTime() {
+    //     return waitTime;
+    // }
+
+    double getServiceTime() {
+        return this.serviceTime;
     }
 
     @Override
