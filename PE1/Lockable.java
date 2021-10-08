@@ -1,3 +1,0 @@
-interface Lockable {
-    Markable lock();
-}
