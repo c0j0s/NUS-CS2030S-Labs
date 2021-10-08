@@ -1,0 +1,3 @@
+interface Markable {
+    int mark();
+}

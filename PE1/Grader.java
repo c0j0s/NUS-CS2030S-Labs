@@ -1,4 +1,4 @@
-abstract class Grader {
+class Grader {
     private final int ans;
 
     Grader(int ans) {
@@ -9,5 +9,7 @@ abstract class Grader {
         return ans;
     }
 
-    abstract int compute(int g);
+    int compute(int g) {
+        return ans == g? 1:0;
+    }
 }
