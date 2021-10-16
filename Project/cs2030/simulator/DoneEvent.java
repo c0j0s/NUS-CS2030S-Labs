@@ -1,16 +1,13 @@
 package cs2030.simulator;
 
-class DoneEvent extends Event {
-
-    private final int serverId;
+class DoneEvent extends HandledEvent {
 
     DoneEvent(Event event, double nextTiming, int serverId) {
-        super(event, EventState.DONE, nextTiming);
-        this.serverId = serverId;
+        super(EventState.DONE, nextTiming, event.getCustomer(), serverId);
     }
     
     @Override
     public String toString() {
-        return super.toString() + " done serving by server " + serverId;
+        return super.toString() + " done serving by server " + getServerId();
     }
 }

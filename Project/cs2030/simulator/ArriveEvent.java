@@ -8,17 +8,8 @@ class ArriveEvent extends Event {
      * @param eventTime event timing
      * @param customer a customer
      */
-    public ArriveEvent(Double eventTime, Customer customer) {
+    ArriveEvent(Double eventTime, Customer customer) {
         super(EventState.ARRIVE, eventTime, customer);
-    }
-
-    /**
-     * Constructor for conversion to arrival event.
-     * 
-     * @param event a privious event
-     */
-    public ArriveEvent(Event event) {
-        super(event, EventState.ARRIVE);
     }
 
     @Override

@@ -3,7 +3,7 @@ package cs2030.simulator;
 class LeaveEvent extends Event {
 
     LeaveEvent(Event event) {
-        super(event, EventState.LEAVE);
+        super(EventState.LEAVE, event.getTime(), event.getCustomer());
     }
 
     @Override

@@ -4,19 +4,11 @@ abstract class Event implements Comparable<Event> {
     private final EventState state;
     private final double eventTime;
     private final Customer customer;
-    
+
     Event(EventState state, double eventTime, Customer customer) {
         this.state = state;
         this.eventTime = eventTime;
         this.customer = customer;
-    }
-
-    Event(Event event, EventState state) {
-        this(state, event.eventTime, event.customer);
-    }
-
-    Event(Event event, EventState state, double eventTime) {
-        this(state, eventTime, event.customer);
     }
 
     EventState getState() {

@@ -1,105 +1,135 @@
 package cs2030.simulator;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
 
 class ServerManager {
 
-    private final PriorityQueue<Server> servers;
-    StatsManager st;
+    // private final List<Server> servers;
+    // private final List<Double> serverBreakTimes;
+
+    private static final int DEFAULT_QUEUE_MAX = 1;
+    private static final int CUST_SERVE = 0;
+    private static final int CUST_LEAVE = 1;
+    private static final int CUST_WAIT = 2;
+
+    private final ServerList servers;
+
+    // mutable map for stat collection
+    private final Map<Integer, Double> stat;
 
     ServerManager(int numOfServer) {
-        this(numOfServer, 1);
+        this(numOfServer, DEFAULT_QUEUE_MAX);
     }
 
+    /**
+     * Base constructor for ServerManager.
+     * Init stat with default values.
+     * @param numOfServer number of server
+     * @param queueMax server queue length limit
+     */
     ServerManager(int numOfServer, int queueMax) {
-        servers = new PriorityQueue<Server>();
-        for (int i = 0; i < numOfServer; i++) {
-            servers.add(new Server(i + 1, queueMax));
-        }
-        st = new StatsManager();
+        this.servers = new ServerList(numOfServer, queueMax);
+        stat = new HashMap<Integer, Double>();
+        stat.put(CUST_SERVE, 0d);
+        stat.put(CUST_LEAVE, 0d);
+        stat.put(CUST_WAIT, 0d);
     }
 
     String getStats() {
-        return st.toString();
+        return String.format("[%.3f %.0f %.0f]", 
+            stat.get(CUST_WAIT) / stat.get(CUST_SERVE), 
+            stat.get(CUST_SERVE), 
+            stat.get(CUST_LEAVE));
     }
 
-    Server getAvailableServer() {
-        return servers.poll();
-    }
+    Optional<Event> handleArrive(Event event) {
+        try {
+            Server server = servers.getAvailableServer();
+            Event output = event;
 
-    List<Server> getServerByEvent(Event event) {
-        List<Server> list = new ArrayList<Server>();
-        for (Server server : servers) {
-            if (server.hasCustomer(event.getCustomer())) {
-                servers.remove(server);
-                list.add(server);
-                return list;
+            switch (server.getState()) {
+                case IDLE:
+                    output = new ServeEvent(event, server.getId());
+                    server = server.serve(event);
+                    break;
+                case SERVING:
+                    output = new WaitEvent(event, server.getId());
+                    server = server.wait(event);
+                    break;
+                default: // FULL or BREAK
+                    stat.put(CUST_LEAVE, stat.get(CUST_LEAVE) + 1);
+                    output = new LeaveEvent(event);
+                    break;
             }
-        }
 
-        return list;
+            servers.returnServer(server);
+            return Optional.of(output);
+        } catch (ServerNotFoundException e) {
+            return Optional.empty();
+        }
     }
 
-    /**
-     * To update server state when done with a customer
-     * @param event
-     */
-    void notifyDone(Event event) {
-        List<Server> list = getServerByEvent(event);
-        if (list.size() == 1) {
-            Server server = list.get(0);
+    Optional<Event> handleServe(Event event) {
+        try {
+            Server server = servers.getServerByEvent(event);
             server = server.done(event);
-            servers.offer(server);
+            servers.returnServer(server);
+            return Optional.of(new DoneEvent(event, server.getNextTiming(), server.getId()));
+        } catch (ServerNotFoundException e) {
+            return Optional.empty();
         }
     }
 
-    /**
-     * Handles events base on the avaiable server state
-     * @param event
-     * @return
-     */
-    List<Event> handleEvent(Event event) {
-        List<Event> results = new ArrayList<Event>();
-        Server server = this.getAvailableServer();
+    Optional<Event> handleDone(Event event) {
+        try {
+            // record Customer Served
+            stat.put(CUST_SERVE, stat.get(CUST_SERVE) + 1);
 
-        switch (server.getState()) {
-            case IDLE:
-                // schedule a serve
-                results.add(new ServeEvent(event, event.getTime(), server.getId()));
-                server = server.serve(event);
+            Server server = servers.getServerByEvent(event);
+            server = server.releaseCustomer(event);
+            servers.returnServer(server);
+            final int serverId = server.getId();
 
-                // schedule a done event
-                results.add(new DoneEvent(event, server.getNextTiming(), server.getId()));
-                break;
-            case SERVING:
-                // schedule a wait event with default event timing
-                results.add(new WaitEvent(event, server.getId()));
-                server = server.wait(event);
+            // record wait time
+            stat.put(CUST_WAIT, stat.get(CUST_WAIT) + (server.getCustomerWaitTime()));
 
-                // schedule a next serve event with the next server available timing
-                results.add(new ServeEvent(event, server.getNextTiming(), server.getId()));
-                server = server.serveNext(event);
-
-                // schedule a done event base on the new server timing
-                results.add(new DoneEvent(event, server.getNextTiming(), server.getId()));
-                break;
-            case FULL:
-                // schedule a leave event
-                results.add(new LeaveEvent(event));
-            default:
-                break;
+            return server.getNextCustomer().map(c -> new ServeEvent(event, c, serverId));
+        } catch (ServerNotFoundException e) {
+            return Optional.empty();
         }
+    }
 
-        // return server to pool 
-        servers.offer(server);
+    Optional<Event> handleDoneAndRest(Event event, Double duration) {
+        try {
+            // record Customer Served
+            stat.put(CUST_SERVE, stat.get(CUST_SERVE) + 1);
+            Server server = servers.getServerByEvent(event);
+            Customer dummy = new Customer(0 - server.getId());
+            server = server.releaseCustomer(event).rest(duration, dummy);
+            servers.returnServer(server);
 
-        // TODO: stat manager is not working 
-        st = st.recordEvents(results);
+            return Optional.of(new RestEvent(server.getNextTiming(), dummy, server.getId()));
+        } catch (ServerNotFoundException e) {
+            return Optional.empty();
+        }
+    }
 
-        // return simulated results
-        return results;
+    Optional<Event> handleServerWake(Event event) {
+        try {
+            Server server = servers.getServerByEvent(event);
+            server = server.wake(event);
+            servers.returnServer(server);
+            final int serverId = server.getId();
+
+            // record wait time
+            stat.put(CUST_WAIT, stat.get(CUST_WAIT) + (server.getCustomerWaitTime()));
+
+            return server.getNextCustomer().map(c -> new ServeEvent(event, c, serverId));
+        } catch (ServerNotFoundException e) {
+            return Optional.empty();
+        }
     }
 
 }
