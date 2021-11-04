@@ -17,8 +17,8 @@ class Main2 {
             serviceTimes.add(sc.nextDouble());
         }
 
-        Simulator s = new Simulator(arrivalTimes, serviceTimes);
-        s.simulate(numOfServer, queueMax);
+        Simulator s = new Simulator(arrivalTimes, serviceTimes, new ArrayList<Double>());
+        s.simulate(numOfServer, 0, queueMax);
         sc.close();
     }
 }

@@ -1,15 +1,16 @@
 package cs2030.simulator;
 
+import java.util.Optional;
+
 class ArriveEvent extends Event {
 
     /**
-     * Constructor for new arrival event.
-     * 
-     * @param eventTime event timing
-     * @param customer a customer
+     * Arrive: new event.
+     * @param eventTime arrival time
+     * @param customer customer attached to event
      */
     ArriveEvent(Double eventTime, Customer customer) {
-        super(EventState.ARRIVE, eventTime, customer);
+        super(EventState.ARRIVE, eventTime, Optional.<Customer>ofNullable(customer));
     }
 
     @Override

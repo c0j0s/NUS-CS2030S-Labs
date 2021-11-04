@@ -1,10 +1,10 @@
-import java.util.Scanner;
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
 import cs2030.simulator.Simulator;
 
-class Main3 {
+class Main4 {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         List<Double> arrivalTimes = new ArrayList<Double>();
@@ -12,6 +12,7 @@ class Main3 {
         List<Double> serverBreakTimes = new ArrayList<Double>();
 
         int numOfServer = sc.nextInt();
+        int numOfSelfServer = sc.nextInt();
         int queueMax = sc.nextInt();
         int numOfCust = sc.nextInt();
 
@@ -25,7 +26,7 @@ class Main3 {
         }
 
         Simulator s = new Simulator(arrivalTimes, serviceTimes, serverBreakTimes);
-        s.simulate(numOfServer, 0, queueMax);
+        s.simulate(numOfServer, numOfSelfServer, queueMax);
         sc.close();
     }
 }

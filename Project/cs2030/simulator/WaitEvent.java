@@ -1,13 +1,17 @@
 package cs2030.simulator;
 
-class WaitEvent extends HandledEvent {
+class WaitEvent extends Event {
 
-    public WaitEvent(Event event, int serverId) {
-        super(EventState.WAIT, event.getTime(), event.getCustomer(), serverId);
+    /**
+     * Arrive to Wait: new state.
+     * @param event arrive event
+     */
+    WaitEvent(Event event) {
+        super(EventState.WAIT, event.getTime(), event.getCustomer());
     }
 
     @Override
     public String toString() {
-        return super.toString() + " waits at server " + getServerId();
+        return super.toString() + " waits at ";
     }
 }

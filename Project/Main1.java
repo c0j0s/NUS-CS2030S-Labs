@@ -14,7 +14,7 @@ class Main1 {
             arrivalTimes.add(sc.nextDouble());
         }
         Simulator s = new Simulator(arrivalTimes);
-        s.simulate(numOfServer);
+        s.simulate(numOfServer, 0, 1);
         sc.close();
     }
 }

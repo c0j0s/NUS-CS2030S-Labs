@@ -1,13 +1,21 @@
 package cs2030.simulator;
 
-class RestEvent extends HandledEvent {
+import java.util.Optional;
 
-    RestEvent(Double eventTime, Customer dummy, int serverId) {
-        super(EventState.REST, eventTime, dummy, serverId);
+class RestEvent extends Event {
+
+    /**
+     * Done -> Rest: new State.
+     * @param eventTime new event time
+     * @param customer new customer
+     */
+    RestEvent(Double eventTime, Optional<Customer> customer) {
+        super(EventState.REST, eventTime, customer);
     }
+
 
     @Override
     public String toString() {
-        return super.toString() + " waiting at resting server " + getServerId();
+        return super.toString() + " resting server: ";
     }
 }
