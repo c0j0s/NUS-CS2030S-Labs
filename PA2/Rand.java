@@ -5,31 +5,32 @@ import java.util.stream.Stream;
 import java.util.Random;
 
 class Rand<T> {
-    private final Supplier<T> seed;
+    private final int seed;
+    private final Function<Integer, T> f;
     
-    Rand(Supplier<T> s) {
-        this.seed = s;
+    Rand(Supplier<Integer> s, Function<Integer, T> f) {
+        this.seed = s.get();
+        this.f = f;
     }
 
-    static Rand of(T s) {
-        return new Rand<T>(() -> s);
+    static Rand<Integer> of(int s) {
+        return new Rand<Integer>(() -> s, x -> x);
     }
 
     T get() {
-        return seed.get();
+        return f.apply(seed);
     }
 
     Rand<T> next() {
-        return new Rand<T>(() -> new Random(get()).nextInt(Integer.MAX_VALUE));
+        return new Rand<T>(() -> new Random(seed).nextInt(Integer.MAX_VALUE), f);
     }
 
-    Stream<Integer> stream() {
-        return Stream.<Integer>iterate(get(), x -> new Random(x).nextInt(Integer.MAX_VALUE));
+    Stream<T> stream() {
+        return Stream.iterate(seed, x -> new Random(x).nextInt(Integer.MAX_VALUE)).map(f);
     }
 
-    <R> Rand map(Function<T, R> mapper) {
-        // issue with swapping map and next
-        return new Rand<R>(() -> mapper.apply(get()));
+    <R> Rand<R> map(Function<T, R> mapper) {
+        return new Rand<R>(() -> seed, mapper.compose(f));
     }
 
     static <R> Stream<R> randRange(Integer seed, Function<Integer, R> mapper) {
@@ -37,7 +38,8 @@ class Rand<T> {
     }
 
     <R> Rand<R> flatMap(Function<T, Rand<R>> mapper) {
-        return new Rand<R>(() -> mapper.apply(get()).get());
+        Function<Rand<R>, R> uw = x -> x.get();
+        return new Rand<R>(() -> seed, uw.compose(mapper).compose(f));
     }
 
     public String toString() {
