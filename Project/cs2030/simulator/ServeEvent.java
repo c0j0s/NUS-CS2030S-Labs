@@ -1,25 +1,29 @@
 package cs2030.simulator;
 
+import java.util.Optional;
+
 class ServeEvent extends Event {
 
-    private final int serverId;
-
-    ServeEvent(double nextTiming, Customer customer, int serverId) {
-        super(EventState.SERVE, nextTiming, customer);
-        this.serverId = serverId;
+    /**
+     * Arrive to Serve: new state.
+     * @param event arrive event
+     * @param nextTiming new event timing
+     */
+    ServeEvent(Event event) {
+        super(EventState.SERVE, event.getTime(), event.getCustomer());
     }
 
-    ServeEvent(Event event, double nextTiming, int serverId) {
-        this(nextTiming, event.getCustomer(), serverId);
-    }
-
-    ServeEvent(Event event, int serverId) {
-        this(event.getTime(), event.getCustomer(), serverId);
+    /**
+     * Done to Serve: new state and customer.
+     * @param event done event
+     * @param customer new customer
+     */
+    ServeEvent(Event event, Optional<Customer> customer) {
+        super(EventState.SERVE, event.getTime(), customer);
     }
 
     @Override
     public String toString() {
-        return super.toString() + " serves by server " + serverId;
+        return super.toString() + " serves by ";
     }
-
 }

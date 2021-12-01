@@ -5,6 +5,7 @@ enum EventState {
     WAIT,
     SERVE,
     DONE,
-    LEAVE
+    LEAVE,
+    REST
 }
 

@@ -1,29 +1,30 @@
 package cs2030.simulator;
 
-class Customer implements Comparable<Customer> {
-    private final int id;
-    // private final double waitTime;
-    private final double serviceTime;
+import java.util.function.Supplier;
 
-    Customer(int id) {
-        this(id, 0);
-    }
+/**
+ * A customer class.
+ */
+class Customer implements Comparable<Customer> {
+    
+    private final int id;
+    private final Supplier<Double> serviceTime;
 
     Customer(int id, double serviceTime) {
+        this(id, () -> serviceTime);
+    }
+
+    Customer(int id, Supplier<Double> serviceTime) {
         this.id = id;
         this.serviceTime = serviceTime;
     }
 
-    Customer(Customer customer, double waitTime) {
-        this(customer.id, waitTime);
+    double getServiceTime() {
+        return this.serviceTime.get();
     }
 
-    // double getWaitTime() {
-    //     return waitTime;
-    // }
-
-    double getServiceTime() {
-        return this.serviceTime;
+    boolean isGreedy() {
+        return false;
     }
 
     @Override
