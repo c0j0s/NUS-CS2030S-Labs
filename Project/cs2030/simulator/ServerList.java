@@ -39,7 +39,7 @@ class ServerList {
     }
 
     /**
-     * Get most suitable server.
+     * Returns the most suitable server.
      * Handles server state change internally.
      * @param customer      incoming customer
      * @param foundServer   handler to handle if server found
