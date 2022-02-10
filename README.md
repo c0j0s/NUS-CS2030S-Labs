@@ -1,2 +1,2 @@
-# CS2030S AY21/22 SEM1
- Stuff from CS2030S AY21/22 SEM1
+# CS2030S Labs
+ Stuff from CS2030S Labs
